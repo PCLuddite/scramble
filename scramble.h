@@ -52,7 +52,7 @@ typedef struct {
 } STR_LIST; /* simple struct for storing pointers to strings */
 
 void list_append(STR_LIST* found, char* word, size_t pos); /* appends a pointer to a string in a string list */
-void count_alpha(const char* str, size_t* alpha_count); /* gets a letter count for a given string */
+size_t count_alpha(const char* str, size_t* alpha_count); /* gets a letter count for a given string, returns string length */
 BOOL countcmp(size_t* alpha1, size_t* alpha2); /* checks to see if two letter counts are equal */
 size_t find_end(const char* str, size_t len); /* finds the end of a word (basically trimend) */
 

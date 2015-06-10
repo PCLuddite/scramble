@@ -66,7 +66,7 @@ void findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE* i
 	size_t found_pos = 0;
 	char word[MAX_WORD];
 
-	count_alpha(letters, alpha1);
+	size_t letters_len = count_alpha(letters, alpha1);
 
 	while (fgets(word, MAX_WORD, in)) {
 		size_t len = find_end(word, strlen(word));
@@ -135,16 +135,15 @@ void showError(const char* msg) {
 	exit(2);
 }
 
-void count_alpha(const char* str, size_t* alpha_count) {
-	
+size_t count_alpha(const char* str, size_t* alpha_count) {
+	size_t pos;
 	memset(alpha_count, 0, sizeof(size_t) * ALPHABET_SIZE); /* set count to 0 */
-
-	while (*str != '\0') { /* expecting null-terminated string */
-		if (isalpha(*str)) {
-			alpha_count[tolower(*str) - 'a']++; /* increment letter count */
+    for(pos = 0; str[pos] != '\0'; ++pos) {
+        if (isalpha(str[pos])) {
+			alpha_count[tolower(str[pos]) - 'a']++; /* increment letter count */
 		}
-		++str;
-	}
+    }
+    return pos;
 }
 
 BOOL countcmp(size_t* alpha1, size_t* alpha2) {
