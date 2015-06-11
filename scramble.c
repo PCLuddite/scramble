@@ -61,34 +61,34 @@ int main(int argc, char* argv[]) {
 }
 
 void findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE* in) {
-	size_t alpha1[ALPHABET_SIZE];
-	size_t alpha2[ALPHABET_SIZE];
-	size_t found_pos = 0;
-	char word[MAX_WORD];
+	size_t alpha1[ALPHABET_SIZE]; /* letter count of the given letter set */
+	size_t alpha2[ALPHABET_SIZE]; /* the letter count of the current word */
+	size_t found_pos = 0; /* the current position in the list */
+	char word[MAX_WORD]; /* the current word */
 
 	size_t letters_len = count_alpha(letters, alpha1);
 
-	while (fgets(word, MAX_WORD, in)) {
-		size_t len = find_end(word, strlen(word));
-		if (len <= letters_len && len > 0) {
-			BOOL good = TRUE;
+	while (fgets(word, MAX_WORD, in)) { /* read each word in the file */
+		size_t len = find_end(word, strlen(word)); /* find the end of the word (skipping trailing whitespace) */
+		if (len <= letters_len && len > 0) { /* if this word is longer, don't bother */
+			BOOL good = TRUE; /* stores if this word meets the criteria */
 			size_t i;
 			memset(alpha2, 0, sizeof(size_t) * ALPHABET_SIZE);
-			for (i = 0; good && i < len; ++i) {
+			for (i = 0; good && i < len; ++i) { /* traverse the string and count the letters */
 				if (isalpha(word[i])) {
 					size_t index = tolower(word[i]) - 'a';
-					if (alpha1[index] == 0) {
+					if (alpha1[index] == 0) { /* the given letter set doesn't contain this letter */
 						good = FALSE;
 					}
 					else {
 						++alpha2[index];
-						if (alpha2[index] > alpha1[index]) {
+						if (alpha2[index] > alpha1[index]) { /* can't have more letters than the given letter set*/
 							good = FALSE;
 						}
 					}
 				}
 			}
-			if (anagrams_only) {
+			if (good && anagrams_only) { /* if good and only looking for anagrams, make sure they're equal */
 				good = countcmp(alpha1, alpha2);
 			}
 			if (good) {
@@ -101,7 +101,7 @@ void findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE* i
 	found->count = found_pos;
 }
 
-DWORD GetWordPath(const char* arg0, char* buff, DWORD buff_size) {
+DWORD GetWordPath(const char* arg0, char* buff, size_t buff_size) {
 	DWORD size;
 	DWORD index;
 	char* temp_path = malloc(buff_size);
@@ -109,25 +109,28 @@ DWORD GetWordPath(const char* arg0, char* buff, DWORD buff_size) {
 #ifdef _WIN32
 	size = GetModuleFileNameA(NULL, temp_path, buff_size);
 #elif defined __linux__
-	size = readlink("/proc/self/exe", temp_path, buff_size);
+	size = readlink("/proc/self/exe", temp_path, buff_size); /* hopefully it's a linux version that supports this */
 #else
     strcpy(temp_path, arg0);
     size = strlen(temp_path);
 #endif
 
-    for(index = size - 1; index > 0; --index) {
+    for(index = size - 1; index > 0; --index) { /* go backwards until we reach a directory separator */
         if (temp_path[index] == SEPARATOR) {
-            temp_path[index + 1] = '\0';
-            strcpy(buff, temp_path);
-            strcat(buff, "words.txt");
+            temp_path[index + 1] = '\0'; /* set where we want the string to end (one after the separator) */
+            strcpy(buff, temp_path); /* copy the temp path to the buff */
+            strcat(buff, "words.txt"); /* append the file we're looking for */
             free(temp_path);
             return index + 9;
         }
     }
-	*buff = '.'; /* fail safe, hopefully it's in the startup path */
-	*(buff + 1) = '\0'; /* null terminating */
+    
+    strcpy(buff, ".");
+    strcat(buff, SEPARATOR);
+    strcat(buff, "words.txt"); /* fail safe, hopefully it's in the startup path */
+    
     free(temp_path);
-    return 1;
+    return 11; /* yeah, magic numbers, I know. It's the string length. */
 }
 
 void showError(const char* msg) {
@@ -137,10 +140,10 @@ void showError(const char* msg) {
 
 size_t count_alpha(const char* str, size_t* alpha_count) {
 	size_t pos;
-	memset(alpha_count, 0, sizeof(size_t) * ALPHABET_SIZE); /* set count to 0 */
+	memset(alpha_count, 0, sizeof(size_t) * ALPHABET_SIZE);
     for(pos = 0; str[pos] != '\0'; ++pos) {
         if (isalpha(str[pos])) {
-			alpha_count[tolower(str[pos]) - 'a']++; /* increment letter count */
+			alpha_count[tolower(str[pos]) - 'a']++;
 		}
     }
     return pos;
@@ -166,7 +169,7 @@ void list_append(STR_LIST* found, char* word, size_t pos) {
 		}
         found->list = new_words;
     }
-    found->list[pos] = word; // append
+    found->list[pos] = word; /* append */
 }
 
 size_t find_end(const char* str, size_t len) {
@@ -178,5 +181,5 @@ size_t find_end(const char* str, size_t len) {
 
 void showUsage(void) {
     printf("usage: scramble [-a] <word>\n");
-    printf("\n-a\tfind only anagrams");
+    printf("\n-a\tfind only anagrams\n");
 }

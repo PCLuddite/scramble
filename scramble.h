@@ -56,7 +56,7 @@ size_t count_alpha(const char* str, size_t* alpha_count); /* gets a letter count
 BOOL countcmp(size_t* alpha1, size_t* alpha2); /* checks to see if two letter counts are equal */
 size_t find_end(const char* str, size_t len); /* finds the end of a word (basically trimend) */
 
-DWORD GetWordPath(const char* arg0, char* buff, DWORD buff_size); /* gets the path of a word file */
+DWORD GetWordPath(const char* arg0, char* buff, size_t buff_size); /* gets the path of a word file */
 void showError(const char* msg); /* shows an error message and exits */
 void showUsage(void); /* shows the program usage */
 
