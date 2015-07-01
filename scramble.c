@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
 		return 2;
 	}
 
-	found.list = (char**)calloc(sizeof(char*), INTIAL_SIZE);
+	found.list = (char**)malloc(INTIAL_SIZE * sizeof(char*));
 	if (found.list == NULL) {
 		ERROR_NO_MEM;
 	}
@@ -141,22 +141,22 @@ void showError(const char* msg) {
 size_t count_alpha(const char* str, size_t* alpha_count) {
 	size_t pos;
 	memset(alpha_count, 0, sizeof(size_t) * ALPHABET_SIZE);
-    for(pos = 0; str[pos] != '\0'; ++pos) {
-        if (isalpha(str[pos])) {
+    	for(pos = 0; str[pos] != '\0'; ++pos) {
+        	if (isalpha(str[pos])) {
 			alpha_count[tolower(str[pos]) - 'a']++;
 		}
-    }
-    return pos;
+    	}
+    	return pos;
 }
 
 BOOL countcmp(size_t* alpha1, size_t* alpha2) {
-    size_t i = 0;
+    	size_t i = 0;
 	for (; i < ALPHABET_SIZE; ++i) {
 		if (alpha1[i] != alpha2[i]) {
-            return FALSE;
-        }
+            		return FALSE;
+        	}
 	}
-    return TRUE;
+    	return TRUE;
 }
 
 void list_append(STR_LIST* found, char* word, size_t pos) {
