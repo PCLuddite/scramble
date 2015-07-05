@@ -5,7 +5,7 @@ int main(int argc, char* argv[]) {
 	char path[MAX_PATH];
 	FILE* wordsfile;
 	STR_LIST found;
-	size_t i;
+	size_t count;
 	BOOL anagrams = FALSE;
 	
 	if (argc == 3) {
@@ -35,35 +35,33 @@ int main(int argc, char* argv[]) {
 		return 2;
 	}
 
-	found.list = (char**)malloc(INTIAL_SIZE * sizeof(char*));
+	found.list = malloc(MAX_WORD * sizeof*(found.list));
 	if (found.list == NULL) {
 		ERROR_NO_MEM;
 	}
 	
-	found.maxsize = INTIAL_SIZE;
+	found.maxsize = MAX_WORD;
 	found.count = 0;
 
 	if (found.list == NULL) {
 		ERROR_NO_MEM;
 	}
-	findwords(letters, &found, anagrams, wordsfile);
+	count = findwords(letters, &found, anagrams, wordsfile);
 
 	fclose(wordsfile);
 	
-	for (i = 0; i < found.count; ++i) {
-		printf("%s", found.list[i]);
-		free(found.list[i]);
-	}
-	printf("%lu word(s) found.\n", i);
+	printf("%s", found.list);
+	printf("%lu word(s) found.\n", count);
 
 	free(found.list);
+
 	return 0;
 }
 
-void findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE* in) {
+size_t findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE* in) {
 	size_t alpha1[ALPHABET_SIZE]; /* letter count of the given letter set */
 	size_t alpha2[ALPHABET_SIZE]; /* the letter count of the current word */
-	size_t found_pos = 0; /* the current position in the list */
+	size_t count = 0; /* the number of words found */
 	char word[MAX_WORD]; /* the current word */
 
 	size_t letters_len = count_alpha(letters, alpha1);
@@ -92,13 +90,13 @@ void findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE* i
 				good = countcmp(alpha1, alpha2);
 			}
 			if (good) {
-				char* str = malloc(len + 1);
-				strcpy(str, word);
-				list_append(found, str, found_pos++);
+				list_append(found, word, len); /* append to list */
+				++count; /* increment count */
 			}
 		}
 	}
-	found->count = found_pos;
+	found->list[found->count] = '\0'; /* add null-terminator */
+	return count;
 }
 
 DWORD GetWordPath(const char* arg0, char* buff, size_t buff_size) {
@@ -116,7 +114,7 @@ DWORD GetWordPath(const char* arg0, char* buff, size_t buff_size) {
 #endif
 
     for(index = size - 1; index > 0; --index) { /* go backwards until we reach a directory separator */
-        if (temp_path[index] == SEPARATOR) {
+        if (temp_path[index] == SEPARATOR[0]) {
             temp_path[index + 1] = '\0'; /* set where we want the string to end (one after the separator) */
             strcpy(buff, temp_path); /* copy the temp path to the buff */
             strcat(buff, "words.txt"); /* append the file we're looking for */
@@ -140,7 +138,7 @@ void showError(const char* msg) {
 
 size_t count_alpha(const char* str, size_t* alpha_count) {
 	size_t pos;
-	memset(alpha_count, 0, sizeof(size_t) * ALPHABET_SIZE);
+	memset(alpha_count, 0, ALPHABET_SIZE * sizeof*alpha_count);
     	for(pos = 0; str[pos] != '\0'; ++pos) {
         	if (isalpha(str[pos])) {
 			alpha_count[tolower(str[pos]) - 'a']++;
@@ -159,17 +157,22 @@ BOOL countcmp(size_t* alpha1, size_t* alpha2) {
     	return TRUE;
 }
 
-void list_append(STR_LIST* found, char* word, size_t pos) {
-	if (pos == found->maxsize) { /* max-size has been reached, time to realloc */
-		char** new_words;
-		found->maxsize *= 2; /* double list size */
-		new_words = (char**)realloc(found->list, found->maxsize * sizeof(char*));
+void list_append(STR_LIST* found, const char* word, size_t len) {
+	size_t pos = found->count;
+	found->count += len+1; /* also include space for newline char */
+	if (found->count >= found->maxsize) { /* max-size has been reached, time to realloc */
+		char* new_words;
+		do {
+			found->maxsize *= 2; /* double list size until we have space */
+		} while(found->count >= found->maxsize);
+		new_words = realloc(found->list, found->maxsize * sizeof(*new_words));
 		if (new_words == NULL) {
 			ERROR_NO_MEM; /* yikes */
 		}
         found->list = new_words;
     }
-    found->list[pos] = word; /* append */
+    memcpy(found->list + pos, word, (len+1) * sizeof*word); /* copy the word to the end of the string */
+    found->list[found->count++] = '\n'; /* add newline char */
 }
 
 size_t find_end(const char* str, size_t len) {
