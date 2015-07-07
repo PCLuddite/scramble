@@ -46,21 +46,21 @@
 #define ALPHABET_SIZE 26 /* as if this would need to be changed */
 
 typedef struct {
-	char* list;
-	size_t count;
+	char* ptr;
+	size_t size;
 	size_t maxsize;
-} STR_LIST; /* simple struct for storing pointers to strings */
+} CSTRING; /* simple struct for storing a pointer to a string */
 
-void list_append(STR_LIST* found, const char* word, size_t len); /* appends a pointer to a string in a string list */
+void cstrcatln(CSTRING* dest, const char* src, size_t len); /* appends the src string and a new line '\n' to dest string */
 size_t count_alpha(const char* str, size_t* alpha_count); /* gets a letter count for a given string, returns string length */
 BOOL countcmp(size_t* alpha1, size_t* alpha2); /* checks to see if two letter counts are equal */
-size_t find_end(const char* str, size_t len); /* finds the end of a word (basically trimend) */
+size_t find_end(const char* str); /* finds the end of a word (a null-terminator or whitespace) */
 
 DWORD GetWordPath(const char* arg0, char* buff, size_t buff_size); /* gets the path of a word file */
 void showError(const char* msg); /* shows an error message and exits */
 void showUsage(void); /* shows the program usage */
 
-size_t findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE* in); /* reads a word file and finds words matching the given parameters */
+size_t findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* in); /* reads a word file and finds words matching the given parameters */
 
 #define ERROR_NO_MEM showError("memory allocation failed") /* no memory error */
 

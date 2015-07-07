@@ -4,7 +4,7 @@ int main(int argc, char* argv[]) {
 	char* letters;
 	char path[MAX_PATH];
 	FILE* wordsfile;
-	STR_LIST found;
+	CSTRING found;
 	size_t count;
 	BOOL anagrams = FALSE;
 	
@@ -35,30 +35,30 @@ int main(int argc, char* argv[]) {
 		return 2;
 	}
 
-	found.list = malloc(MAX_WORD * sizeof*(found.list));
-	if (found.list == NULL) {
+	found.ptr = malloc(MAX_WORD * sizeof*(found.ptr));
+	if (found.ptr == NULL) {
 		ERROR_NO_MEM;
 	}
 	
 	found.maxsize = MAX_WORD;
-	found.count = 0;
+	found.size = 0;
 
-	if (found.list == NULL) {
+	if (found.ptr == NULL) {
 		ERROR_NO_MEM;
 	}
 	count = findwords(letters, &found, anagrams, wordsfile);
 
 	fclose(wordsfile);
 	
-	printf("%s", found.list);
+	printf("%s", found.ptr);
 	printf("%lu word(s) found.\n", count);
 
-	free(found.list);
+	free(found.ptr);
 
 	return 0;
 }
 
-size_t findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE* in) {
+size_t findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* in) {
 	size_t alpha1[ALPHABET_SIZE]; /* letter count of the given letter set */
 	size_t alpha2[ALPHABET_SIZE]; /* the letter count of the current word */
 	size_t count = 0; /* the number of words found */
@@ -67,11 +67,11 @@ size_t findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE*
 	size_t letters_len = count_alpha(letters, alpha1);
 
 	while (fgets(word, MAX_WORD, in)) { /* read each word in the file */
-		size_t len = find_end(word, strlen(word)); /* find the end of the word (skipping trailing whitespace) */
+		size_t len = find_end(word); /* find the end of the word (skipping trailing whitespace) */
 		if (len <= letters_len && len > 0) { /* if this word is longer, don't bother */
 			BOOL good = TRUE; /* stores if this word meets the criteria */
 			size_t i;
-			memset(alpha2, 0, sizeof(size_t) * ALPHABET_SIZE);
+			memset(alpha2, 0, ALPHABET_SIZE * sizeof*alpha2);
 			for (i = 0; good && i < len; ++i) { /* traverse the string and count the letters */
 				if (isalpha(word[i])) {
 					size_t index = tolower(word[i]) - 'a';
@@ -90,12 +90,12 @@ size_t findwords(const char* letters, STR_LIST* found, BOOL anagrams_only, FILE*
 				good = countcmp(alpha1, alpha2);
 			}
 			if (good) {
-				list_append(found, word, len); /* append to list */
+				cstrcatln(found, word, len); /* append to string */
 				++count; /* increment count */
 			}
 		}
 	}
-	found->list[found->count] = '\0'; /* add null-terminator */
+	found->ptr[found->size] = '\0'; /* add null-terminator */
 	return count;
 }
 
@@ -148,36 +148,37 @@ size_t count_alpha(const char* str, size_t* alpha_count) {
 }
 
 BOOL countcmp(size_t* alpha1, size_t* alpha2) {
-    	size_t i = 0;
+	size_t i = 0;
 	for (; i < ALPHABET_SIZE; ++i) {
 		if (alpha1[i] != alpha2[i]) {
-            		return FALSE;
-        	}
+			return FALSE;
+		}
 	}
-    	return TRUE;
+	return TRUE;
 }
 
-void list_append(STR_LIST* found, const char* word, size_t len) {
-	size_t pos = found->count;
-	found->count += len+1; /* also include space for newline char */
-	if (found->count >= found->maxsize) { /* max-size has been reached, time to realloc */
+void cstrcatln(CSTRING* dest, const char* src, size_t len) {
+	size_t pos = dest->size; /* store the old length of the dest */
+	dest->size += len; /* calculate the new length of the dest */
+	if (dest->size + 1 >= dest->maxsize) { /* max-size has been reached, time to realloc */
 		char* new_words;
 		do {
-			found->maxsize *= 2; /* double list size until we have space */
-		} while(found->count >= found->maxsize);
-		new_words = realloc(found->list, found->maxsize * sizeof(*new_words));
+			dest->maxsize *= 2; /* double dest size until we have space */
+		} while(dest->size + 1 >= dest->maxsize);
+		new_words = realloc(dest->ptr, dest->maxsize * sizeof*new_words);
 		if (new_words == NULL) {
 			ERROR_NO_MEM; /* yikes */
 		}
-        found->list = new_words;
+        dest->ptr = new_words;
     }
-    memcpy(found->list + pos, word, (len+1) * sizeof*word); /* copy the word to the end of the string */
-    found->list[found->count++] = '\n'; /* add newline char */
+    memcpy(dest->ptr + pos, src, len * sizeof*src); /* copy the src to the end of the string */
+    dest->ptr[dest->size++] = '\n'; /* add newline char and increment size by 1 */
 }
 
-size_t find_end(const char* str, size_t len) {
-	while (len > 0 && isspace(str[len - 1])) {
-		--len;
+size_t find_end(const char* str) {
+	size_t len = 0;
+	while(str[len] != '\0' && !isspace(str[len])) { /* scan the string until a null-terminator or space occours*/
+		++len;
 	}
 	return len;
 }
