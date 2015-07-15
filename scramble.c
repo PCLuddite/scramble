@@ -7,9 +7,9 @@ int main(int argc, char* argv[]) {
 	CSTRING found;
 	size_t count;
 	BOOL anagrams = FALSE;
-	
+
 	if (argc == 3) {
-		if (strcmp(argv[1], "-a") == 0) { /* find anagrams only */
+		if (strcmp(argv[1], "-a") == 0 || strcmp(argv[1], "--anagrams") == 0) { /* find anagrams only */
 			letters = argv[2];
 			anagrams = TRUE;
 		}
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 	if (found.ptr == NULL) {
 		ERROR_NO_MEM;
 	}
-	
+
 	found.maxsize = MAX_WORD;
 	found.size = 0;
 
@@ -49,19 +49,19 @@ int main(int argc, char* argv[]) {
 	count = findwords(letters, &found, anagrams, wordsfile);
 
 	fclose(wordsfile);
-	
+
 	printf("%s", found.ptr);
-	printf("%lu word(s) found.\n", count);
+	printf("%i word(s) found.\n", count);
 
 	free(found.ptr);
 
 	return 0;
 }
 
-size_t findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* in) {
+int findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* in) {
 	size_t alpha1[ALPHABET_SIZE]; /* letter count of the given letter set */
 	size_t alpha2[ALPHABET_SIZE]; /* the letter count of the current word */
-	size_t count = 0; /* the number of words found */
+	int count = 0; /* the number of words found */
 	char word[MAX_WORD]; /* the current word */
 
 	size_t letters_len = count_alpha(letters, alpha1);
@@ -90,7 +90,7 @@ size_t findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* 
 				good = countcmp(alpha1, alpha2);
 			}
 			if (good) {
-				cstrcatln(found, word, len); /* append to string */
+				cstr_catln(found, word, len); /* append to string */
 				++count; /* increment count */
 			}
 		}
@@ -122,11 +122,11 @@ DWORD GetWordPath(const char* arg0, char* buff, size_t buff_size) {
             return index + 9;
         }
     }
-    
+
     strcpy(buff, ".");
     strcat(buff, SEPARATOR);
     strcat(buff, "words.txt"); /* fail safe, hopefully it's in the startup path */
-    
+
     free(temp_path);
     return 11; /* yeah, magic numbers, I know. It's the string length. */
 }
@@ -157,7 +157,7 @@ BOOL countcmp(size_t* alpha1, size_t* alpha2) {
 	return TRUE;
 }
 
-void cstrcatln(CSTRING* dest, const char* src, size_t len) {
+void cstr_catln(CSTRING* dest, const char* src, size_t len) {
 	size_t pos = dest->size; /* store the old length of the dest */
 	dest->size += len; /* calculate the new length of the dest */
 	if (dest->size + 1 >= dest->maxsize) { /* max-size has been reached, time to realloc */
@@ -184,6 +184,6 @@ size_t find_end(const char* str) {
 }
 
 void showUsage(void) {
-    printf("usage: scramble [-a] <word>\n");
-    printf("\n-a\tfind only anagrams\n");
+    printf("usage: scramble [--anagrams|-a] <word>\n");
+    printf("\n--anagrams,-a\tfind only anagrams\n");
 }
