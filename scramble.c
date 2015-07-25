@@ -147,7 +147,7 @@ size_t count_alpha(const char* str, size_t* alpha_count) {
     	return pos;
 }
 
-BOOL countcmp(size_t* alpha1, size_t* alpha2) {
+BOOL countcmp(const size_t* alpha1, const size_t* alpha2) {
 	size_t i = 0;
 	for (; i < ALPHABET_SIZE; ++i) {
 		if (alpha1[i] != alpha2[i]) {
