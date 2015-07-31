@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 	wordsfile = fopen(path, "r");
 
 	if (wordsfile == NULL) {
-		printf("unable to load %s", path);
+		printf("unable to load %s\n", path);
 		return 2;
 	}
 
