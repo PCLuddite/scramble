@@ -49,9 +49,9 @@ typedef struct {
 	char* ptr;
 	size_t size;
 	size_t maxsize;
-} CSTRING; /* simple struct for storing a pointer to a string */
+} _cstr; /* simple struct for storing a pointer to a string */
 
-void cstr_catln(CSTRING* dest, const char* src, size_t len); /* appends the src string and a new line '\n' to dest string */
+void cstr_catln(_cstr* dest, const char* src, size_t len); /* appends the src string and a new line '\n' to dest string */
 size_t count_alpha(const char* str, size_t* alpha_count); /* gets a letter count for a given string, returns string length */
 BOOL countcmp(const size_t* alpha1, const size_t* alpha2); /* checks to see if two letter counts are equal */
 size_t find_end(const char* str); /* finds the end of a word (a null-terminator or whitespace) */
@@ -61,7 +61,7 @@ void showError(const char* msg); /* shows an error message and exits */
 void showUsage(void); /* shows the program usage */
 
 /* reads a word file and finds words matching the given parameters, returns number of words found */
-int findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* in);
+int findwords(const char* letters, _cstr* found, char seed, BOOL anagrams_only, FILE* in);
 
 #define ERROR_NO_MEM showError("memory allocation failed") /* no memory error */
 

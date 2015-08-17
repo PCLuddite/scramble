@@ -4,7 +4,7 @@ int main(int argc, char* argv[]) {
 	char* letters;
 	char path[MAX_PATH];
 	FILE* wordsfile;
-	CSTRING found;
+	_cstr found;
 	size_t count;
 	BOOL anagrams = FALSE;
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 	if (found.ptr == NULL) {
 		ERROR_NO_MEM;
 	}
-	count = findwords(letters, &found, anagrams, wordsfile);
+	count = findwords(letters, &found, 0, anagrams, wordsfile);
 
 	fclose(wordsfile);
 
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-int findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* in) {
+int findwords(const char* letters, _cstr* found, char seed, BOOL anagrams_only, FILE* in) {
 	size_t alpha1[ALPHABET_SIZE]; /* letter count of the given letter set */
 	size_t alpha2[ALPHABET_SIZE]; /* the letter count of the current word */
 	int count = 0; /* the number of words found */
@@ -66,19 +66,31 @@ int findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* in)
 
 	size_t letters_len = count_alpha(letters, alpha1);
 
+	if (isalpha(seed)) {
+		seed = tolower(seed);
+	}
+	else if (seed != '\0') {
+		seed = '\0'; /* seed must be a letter, if not, don't use it */
+	}
+	
 	while (fgets(word, MAX_WORD, in)) { /* read each word in the file */
 		size_t len = find_end(word); /* find the end of the word (skipping trailing whitespace) */
+		BOOL has_seed = (seed == '\0');
 		if (len <= letters_len && len > 0) { /* if this word is longer, don't bother */
 			BOOL good = TRUE; /* stores if this word meets the criteria */
 			size_t i;
 			memset(alpha2, 0, ALPHABET_SIZE * sizeof*alpha2);
 			for (i = 0; good && i < len; ++i) { /* traverse the string and count the letters */
 				if (isalpha(word[i])) {
-					size_t index = tolower(word[i]) - 'a';
+					char c = tolower(word[i]);
+					size_t index = c - 'a';
 					if (alpha1[index] == 0) { /* the given letter set doesn't contain this letter */
 						good = FALSE;
 					}
 					else {
+						if (!has_seed && c == seed) {
+							has_seed = TRUE;
+						}
 						++alpha2[index];
 						if (alpha2[index] > alpha1[index]) { /* can't have more letters than the given letter set*/
 							good = FALSE;
@@ -89,7 +101,7 @@ int findwords(const char* letters, CSTRING* found, BOOL anagrams_only, FILE* in)
 			if (good && anagrams_only) { /* if good and only looking for anagrams, make sure they're equal */
 				good = countcmp(alpha1, alpha2);
 			}
-			if (good) {
+			if (good && has_seed) {
 				cstr_catln(found, word, len); /* append to string */
 				++count; /* increment count */
 			}
@@ -157,7 +169,7 @@ BOOL countcmp(const size_t* alpha1, const size_t* alpha2) {
 	return TRUE;
 }
 
-void cstr_catln(CSTRING* dest, const char* src, size_t len) {
+void cstr_catln(_cstr* dest, const char* src, size_t len) {
 	size_t pos = dest->size; /* store the old length of the dest */
 	dest->size += len; /* calculate the new length of the dest */
 	if (dest->size + 1 >= dest->maxsize) { /* max-size has been reached, time to realloc */
