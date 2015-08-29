@@ -6,12 +6,12 @@ int main(int argc, char* argv[]) {
 	FILE* wordsfile;
 	_cstr found;
 	size_t count;
-	BOOL anagrams = FALSE;
+	bool anagrams = false;
 
 	if (argc == 3) {
 		if (strcmp(argv[1], "-a") == 0 || strcmp(argv[1], "--anagrams") == 0) { /* find anagrams only */
 			letters = argv[2];
-			anagrams = TRUE;
+			anagrams = true;
 		}
 		else {
 			showUsage();
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-int findwords(const char* letters, _cstr* found, char seed, BOOL anagrams_only, FILE* in) {
+int findwords(const char* letters, _cstr* found, char seed, bool anagrams_only, FILE* in) {
 	size_t alpha1[ALPHABET_SIZE]; /* letter count of the given letter set */
 	size_t alpha2[ALPHABET_SIZE]; /* the letter count of the current word */
 	int count = 0; /* the number of words found */
@@ -75,9 +75,9 @@ int findwords(const char* letters, _cstr* found, char seed, BOOL anagrams_only, 
 	
 	while (fgets(word, MAX_WORD, in)) { /* read each word in the file */
 		size_t len = find_end(word); /* find the end of the word (skipping trailing whitespace) */
-		BOOL has_seed = (seed == '\0');
+		bool has_seed = (seed == '\0');
 		if (len <= letters_len && len > 0) { /* if this word is longer, don't bother */
-			BOOL good = TRUE; /* stores if this word meets the criteria */
+			bool good = true; /* stores if this word meets the criteria */
 			size_t i;
 			memset(alpha2, 0, ALPHABET_SIZE * sizeof*alpha2);
 			for (i = 0; good && i < len; ++i) { /* traverse the string and count the letters */
@@ -85,15 +85,15 @@ int findwords(const char* letters, _cstr* found, char seed, BOOL anagrams_only, 
 					char c = tolower(word[i]);
 					size_t index = c - 'a';
 					if (alpha1[index] == 0) { /* the given letter set doesn't contain this letter */
-						good = FALSE;
+						good = false;
 					}
 					else {
 						if (!has_seed && c == seed) {
-							has_seed = TRUE;
+							has_seed = true;
 						}
 						++alpha2[index];
 						if (alpha2[index] > alpha1[index]) { /* can't have more letters than the given letter set*/
-							good = FALSE;
+							good = false;
 						}
 					}
 				}
@@ -111,36 +111,42 @@ int findwords(const char* letters, _cstr* found, char seed, BOOL anagrams_only, 
 	return count;
 }
 
-DWORD GetWordPath(const char* arg0, char* buff, size_t buff_size) {
-	DWORD size;
-	DWORD index;
+size_t GetWordPath(const char* arg0, char* buff, size_t buff_size) {
 	char* temp_path = malloc(buff_size);
 
 #ifdef _WIN32
+	/* if windows, define things in terms of DWORD */
+	DWORD size;
+	DWORD index;
 	size = GetModuleFileNameA(NULL, temp_path, buff_size);
-#elif defined __linux__
-	size = readlink("/proc/self/exe", temp_path, buff_size); /* hopefully it's a linux version that supports this */
+#elif defined __unix__
+	ssize_t size;
+	ssize_t index;
+	size = readlink("/proc/self/exe", temp_path, buff_size); /* hopefully it's a unix version that supports this */
 #else
-    strcpy(temp_path, arg0);
-    size = strlen(temp_path);
+	size_t size;
+	size_t index;
+	strcpy(temp_path, arg0); /* hope that the path is in arg0 */
+	size = strlen(temp_path);
 #endif
 
-    for(index = size - 1; index > 0; --index) { /* go backwards until we reach a directory separator */
-        if (temp_path[index] == SEPARATOR[0]) {
-            temp_path[index + 1] = '\0'; /* set where we want the string to end (one after the separator) */
-            strcpy(buff, temp_path); /* copy the temp path to the buff */
-            strcat(buff, "words.txt"); /* append the file we're looking for */
-            free(temp_path);
-            return index + 9;
-        }
-    }
 
-    strcpy(buff, ".");
-    strcat(buff, SEPARATOR);
-    strcat(buff, "words.txt"); /* fail safe, hopefully it's in the startup path */
+	for(index = size - 1; index > 0; --index) { /* go backwards until we reach a directory separator */
+		if (temp_path[index] == SEPARATOR[0]) {
+	        	temp_path[index + 1] = '\0'; /* set where we want the string to end (one after the separator) */
+			strcpy(buff, temp_path); /* copy the temp path to the buff */
+			strcat(buff, "words.txt"); /* append the file we're looking for */
+			free(temp_path);
+			return index + 9;
+		}
+	}
 
-    free(temp_path);
-    return 11; /* yeah, magic numbers, I know. It's the string length. */
+	strcpy(buff, ".");
+	strcat(buff, SEPARATOR);
+	strcat(buff, "words.txt"); /* fail safe, hopefully it's in the startup path */
+
+	free(temp_path);
+	return strlen(buff);
 }
 
 void showError(const char* msg) {
@@ -159,14 +165,14 @@ size_t count_alpha(const char* str, size_t* alpha_count) {
     	return pos;
 }
 
-BOOL countcmp(const size_t* alpha1, const size_t* alpha2) {
+bool countcmp(const size_t* alpha1, const size_t* alpha2) {
 	size_t i = 0;
 	for (; i < ALPHABET_SIZE; ++i) {
 		if (alpha1[i] != alpha2[i]) {
-			return FALSE;
+			return false;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 void cstr_catln(_cstr* dest, const char* src, size_t len) {

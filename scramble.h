@@ -2,14 +2,18 @@
 #define _SCRAMBE_H
 
 /* main header files */
-#include <stdlib.h> /* the universe */
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
-#ifdef __linux__
+#if __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#endif
+
+#ifdef __unix__
 #include <unistd.h> /* for readlink() */
-#endif /* __linux__ */
+#endif /* __unix__ */
 
 #if defined _WIN32 || _MSDOS
 #define SEPARATOR "\\"
@@ -22,21 +26,11 @@
 #include <Windows.h> /* for GetModuleFileNameA */
 #endif /* _WIN32 */
 
-#ifndef BOOL
-#define BOOL int
-#endif /* BOOL */
-
-#ifndef TRUE
-#define TRUE 1
-#endif /* TRUE */
-
-#ifndef FALSE
-#define FALSE 0
-#endif /* FALSE */
-
-#ifndef DWORD
-#define DWORD unsigned long
-#endif /* DWORD */
+#ifndef __bool_true_false_are_defined
+typedef enum {
+	false = 0, true
+} bool;
+#endif
 
 #ifndef MAX_PATH
 #define MAX_PATH 256 /* TODO: determine actual MAX_PATH on Linux 6/9/15 */
@@ -53,15 +47,15 @@ typedef struct {
 
 void cstr_catln(_cstr* dest, const char* src, size_t len); /* appends the src string and a new line '\n' to dest string */
 size_t count_alpha(const char* str, size_t* alpha_count); /* gets a letter count for a given string, returns string length */
-BOOL countcmp(const size_t* alpha1, const size_t* alpha2); /* checks to see if two letter counts are equal */
+bool countcmp(const size_t* alpha1, const size_t* alpha2); /* checks to see if two letter counts are equal */
 size_t find_end(const char* str); /* finds the end of a word (a null-terminator or whitespace) */
 
-DWORD GetWordPath(const char* arg0, char* buff, size_t buff_size); /* gets the path of a word file */
+size_t GetWordPath(const char* arg0, char* buff, size_t buff_size); /* gets the path of a word file */
 void showError(const char* msg); /* shows an error message and exits */
 void showUsage(void); /* shows the program usage */
 
 /* reads a word file and finds words matching the given parameters, returns number of words found */
-int findwords(const char* letters, _cstr* found, char seed, BOOL anagrams_only, FILE* in);
+int findwords(const char* letters, _cstr* found, char seed, bool anagrams_only, FILE* in);
 
 #define ERROR_NO_MEM showError("memory allocation failed") /* no memory error */
 
