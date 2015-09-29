@@ -122,10 +122,10 @@ size_t GetWordPath(const char* arg0, char* buff, size_t buff_size)
 	DWORD size;
 	DWORD index;
 	size = GetModuleFileNameA(NULL, temp_path, buff_size);
-#elif defined __unix__
+#elif defined __linux__
 	ssize_t size;
 	ssize_t index;
-	size = readlink("/proc/self/exe", temp_path, buff_size); /* hopefully it's a unix version that supports this */
+	size = readlink("/proc/self/exe", temp_path, buff_size); /* hopefully it's a linux version that supports this */
 #else
 	size_t size;
 	size_t index;
