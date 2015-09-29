@@ -1,6 +1,7 @@
 #include "scramble.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 	char* letters;
 	char path[MAX_PATH];
 	FILE* wordsfile;
@@ -58,7 +59,8 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-int findwords(const char* letters, _cstr* found, char seed, bool anagrams_only, FILE* in) {
+int findwords(const char* letters, _cstr* found, char seed, bool anagrams_only, FILE* in)
+{
 	size_t alpha1[ALPHABET_SIZE]; /* letter count of the given letter set */
 	size_t alpha2[ALPHABET_SIZE]; /* the letter count of the current word */
 	int count = 0; /* the number of words found */
@@ -111,7 +113,8 @@ int findwords(const char* letters, _cstr* found, char seed, bool anagrams_only, 
 	return count;
 }
 
-size_t GetWordPath(const char* arg0, char* buff, size_t buff_size) {
+size_t GetWordPath(const char* arg0, char* buff, size_t buff_size)
+{
 	char* temp_path = malloc(buff_size);
 
 #ifdef _WIN32
@@ -149,12 +152,14 @@ size_t GetWordPath(const char* arg0, char* buff, size_t buff_size) {
 	return strlen(buff);
 }
 
-void showError(const char* msg) {
+void showError(const char* msg)
+{
 	printf("error: %s\n", msg);
 	exit(2);
 }
 
-size_t count_alpha(const char* str, size_t* alpha_count) {
+size_t count_alpha(const char* str, size_t* alpha_count)
+{
 	size_t pos;
 	memset(alpha_count, 0, ALPHABET_SIZE * sizeof*alpha_count);
     	for(pos = 0; str[pos] != '\0'; ++pos) {
@@ -165,7 +170,8 @@ size_t count_alpha(const char* str, size_t* alpha_count) {
     	return pos;
 }
 
-bool countcmp(const size_t* alpha1, const size_t* alpha2) {
+bool countcmp(const size_t* alpha1, const size_t* alpha2)
+{
 	size_t i = 0;
 	for (; i < ALPHABET_SIZE; ++i) {
 		if (alpha1[i] != alpha2[i]) {
@@ -175,7 +181,8 @@ bool countcmp(const size_t* alpha1, const size_t* alpha2) {
 	return true;
 }
 
-void cstr_catln(_cstr* dest, const char* src, size_t len) {
+void cstr_catln(_cstr* dest, const char* src, size_t len)
+{
 	size_t pos = dest->size; /* store the old length of the dest */
 	dest->size += len; /* calculate the new length of the dest */
 	if (dest->size + 1 >= dest->maxsize) { /* max-size has been reached, time to realloc */
@@ -193,7 +200,8 @@ void cstr_catln(_cstr* dest, const char* src, size_t len) {
     dest->ptr[dest->size++] = '\n'; /* add newline char and increment size by 1 */
 }
 
-size_t find_end(const char* str) {
+size_t find_end(const char* str)
+{
 	size_t len = 0;
 	while(str[len] != '\0' && !isspace(str[len])) { /* scan the string until a null-terminator or space occours*/
 		++len;
@@ -201,7 +209,8 @@ size_t find_end(const char* str) {
 	return len;
 }
 
-void showUsage(void) {
+void showUsage(void)
+{
     printf("usage: scramble [--anagrams|-a] <word>\n");
     printf("\n--anagrams,-a\tfind only anagrams\n");
 }
