@@ -28,12 +28,12 @@ static size_t count_alpha(const char* str, size_t* alpha_count)
 {
 	size_t pos;
 	memset(alpha_count, 0, ALPHABET_SIZE * sizeof*alpha_count);
-    for(pos = 0; str[pos] != '\0'; ++pos) {
-        if (isalpha(str[pos])) {
+	for(pos = 0; str[pos] != '\0'; ++pos) {
+        	if (isalpha(str[pos])) {
 			alpha_count[tolower(str[pos]) - 'a']++;
 		}
-    }
-    return pos;
+	}
+	return pos;
 }
 
 static bool contains_word(const size_t* alpha1, const char* word, size_t wordlen, bool anagrams_only) {
@@ -75,12 +75,10 @@ int findwords(const char* letters, cstring* found, bool anagrams_only, FILE* in)
 
 	while (fgets(word, MAX_WORD, in)) { /* read each word in the file */
 		size_t wordlen = find_end(word); /* find the end of the word (skipping trailing whitespace) */
-		if (wordlen <= letters_len && wordlen > 0) { /* if this word is longer, don't bother */
-			bool good = contains_word(alpha1, word, wordlen, anagrams_only); /* stores if this word meets the criteria */
-			if (good) {
-				cstrcat_ln(found, word, wordlen); /* append to string */
-				++count; /* increment count */
-			}
+		if (wordlen <= letters_len && wordlen > 0 && /* if this word is longer, don't bother */
+                    contains_word(alpha1, word, wordlen, anagrams_only)) { /* stores if this word meets the criteria */
+			cstrcat_ln(found, word, wordlen); /* append to string */
+			++count; /* increment count */
 		}
 	}
 	found->ptr[found->size] = '\0'; /* add null-terminator */
