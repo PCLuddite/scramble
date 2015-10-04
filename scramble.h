@@ -4,14 +4,8 @@
 /* main header files */
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 
-#if __STDC_VERSION__ >= 199901L
-#include <stdbool.h>
-#endif
-
-#ifdef __unix__
+#ifdef __linux__
 #include <unistd.h> /* for readlink() */
 #endif /* __unix__ */
 
@@ -26,12 +20,6 @@
 #include <Windows.h> /* for GetModuleFileNameA */
 #endif /* _WIN32 */
 
-#ifndef __bool_true_false_are_defined
-typedef enum {
-	false = 0, true
-} bool;
-#endif
-
 #ifndef MAX_PATH
 #define MAX_PATH 256 /* TODO: determine actual MAX_PATH on Linux 6/9/15 */
 #endif /* MAX_PATH */
@@ -43,20 +31,15 @@ typedef struct {
 	char* ptr;
 	size_t size;
 	size_t maxsize;
-} _cstr; /* simple struct for storing a pointer to a string */
+} cstring; /* simple struct for storing a pointer to a string */
 
-void cstr_catln(_cstr* dest, const char* src, size_t len); /* appends the src string and a new line '\n' to dest string */
-size_t count_alpha(const char* str, size_t* alpha_count); /* gets a letter count for a given string, returns string length */
-bool countcmp(const size_t* alpha1, const size_t* alpha2); /* checks to see if two letter counts are equal */
-size_t find_end(const char* str); /* finds the end of a word (a null-terminator or whitespace) */
+void cstrcat_ln(cstring* dest, const char* src, size_t len); /* appends the src string and a new line '\n' to dest string */
 
 size_t GetWordPath(const char* arg0, char* buff, size_t buff_size); /* gets the path of a word file */
 void showError(const char* msg); /* shows an error message and exits */
 void showUsage(void); /* shows the program usage */
 
-/* reads a word file and finds words matching the given parameters, returns number of words found */
-int findwords(const char* letters, _cstr* found, char seed, bool anagrams_only, FILE* in);
-
-#define ERROR_NO_MEM showError("memory allocation failed") /* no memory error */
+void* emalloc(size_t siz); /* calls malloc and exits program if failed */
+void* erealloc(void* ptr, size_t newsize); /* calls realloc and exits program if failed */
 
 #endif
