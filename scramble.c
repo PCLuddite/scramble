@@ -1,6 +1,9 @@
 #include "scramble.h"
 #include "finder.h"
 
+/*
+ * displays program usage
+ */
 void showUsage(void)
 {
     fputs("usage: scramble [--anagrams|-a] <word>\n", stdout);

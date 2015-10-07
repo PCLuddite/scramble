@@ -33,13 +33,13 @@ typedef struct {
 	size_t maxsize;
 } cstring; /* simple struct for storing a pointer to a string */
 
-void cstrcat_ln(cstring* dest, const char* src, size_t len); /* appends the src string and a new line '\n' to dest string */
+void cstrcat_ln(cstring* dest, const char* src, size_t len);
 
-size_t GetWordPath(const char* arg0, char* buff, size_t buff_size); /* gets the path of a word file */
-void showError(const char* msg); /* shows an error message and exits */
-void showUsage(void); /* shows the program usage */
+size_t GetWordPath(const char* arg0, char* buff, size_t buff_size);
+void showError(const char* msg);
+void showUsage(void);
 
-void* emalloc(size_t siz); /* calls malloc and exits program if failed */
-void* erealloc(void* ptr, size_t newsize); /* calls realloc and exits program if failed */
+void* emalloc(size_t siz);
+void* erealloc(void* ptr, size_t newsize);
 
 #endif
