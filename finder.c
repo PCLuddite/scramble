@@ -49,7 +49,8 @@ static size_t count_alpha(const char* str, size_t alpha[])
  * checks wether param "alpha1" has the right letters to form "word"
  * param "alpha1" is expected to be at least ALPHABET_SIZE elements
  */
-static bool contains_word(const size_t* alpha1, const char* word, size_t wordlen, bool anagrams_only) {
+static bool contains_word(const size_t* alpha1, const char* word, size_t wordlen, bool anagrams_only)
+{
     size_t alpha2[ALPHABET_SIZE];
     size_t index;
 

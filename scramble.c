@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
 		return 2;
 	}
 
-    /* initialize struct */
-	found.ptr = emalloc(MAX_WORD * sizeof*(found.ptr));
+	/* initialize cstring */
+	found.ptr = emalloc(MAX_WORD * sizeof*found.ptr);
 	found.maxsize = MAX_WORD;
 	found.size = 0;
 
@@ -57,9 +57,13 @@ int main(int argc, char* argv[])
 
 	free(found.ptr);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
+/*
+ * Appends src and a newline ('\n') to dest
+ * src is expected to be at least len characters
+ */
 void cstrcat_ln(cstring* dest, const char* src, size_t len)
 {
 	size_t pos = dest->size; /* store the old length of the dest */
@@ -76,12 +80,18 @@ void cstrcat_ln(cstring* dest, const char* src, size_t len)
     dest->ptr[dest->size++] = '\n'; /* add newline char and increment size by 1 */
 }
 
+/*
+ * Prints an error, then terminates the program
+ */
 void showError(const char* msg)
 {
 	printf("error: %s\n", msg);
 	exit(2);
 }
 
+/*
+ * malloc, but terminates program on error
+ */
 void* emalloc(size_t siz)
 {
     void* ptr = malloc(siz);
@@ -91,6 +101,9 @@ void* emalloc(size_t siz)
     return ptr;
 }
 
+/*
+ * realloc, but terminates program on error
+ */
 void* erealloc(void* ptr, size_t newsize)
 {
     void* newptr = realloc(ptr, newsize);
@@ -100,6 +113,10 @@ void* erealloc(void* ptr, size_t newsize)
     return newptr;
 }
 
+/*
+ * Sets buff to the path of the word file
+ * argv[0] is passed as arg0, but it may not be used depending on the implementation
+ */
 size_t GetWordPath(const char* arg0, char* buff, size_t buff_size)
 {
 	char* temp_path = emalloc(buff_size);
@@ -110,16 +127,17 @@ size_t GetWordPath(const char* arg0, char* buff, size_t buff_size)
 	DWORD index;
 	size = GetModuleFileNameA(NULL, temp_path, buff_size);
 #elif defined __linux__
+	/* POSIX likes ssize_t */
 	ssize_t size;
 	ssize_t index;
 	size = readlink("/proc/self/exe", temp_path, buff_size); /* hopefully it's a linux version that supports this */
 #else
+	/* just hope arg0 contains something useful */
 	size_t size;
 	size_t index;
 	strcpy(temp_path, arg0); /* hope that the path is in arg0 */
 	size = strlen(temp_path);
 #endif
-
 
 	for(index = size - 1; index > 0; --index) { /* go backwards until we reach a directory separator */
 		if (temp_path[index] == SEPARATOR[0]) {
