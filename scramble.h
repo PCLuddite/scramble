@@ -36,8 +36,8 @@ typedef struct {
 void cstrcat_ln(cstring* dest, const char* src, size_t len);
 
 size_t GetWordPath(const char* arg0, char* buff, size_t buff_size);
-void showError(const char* msg);
-void showUsage(void);
+void exit_error(const char* msg);
+void show_usage(void);
 
 void* emalloc(size_t siz);
 void* erealloc(void* ptr, size_t newsize);
