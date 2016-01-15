@@ -69,10 +69,12 @@ static bool contains_word(const size_t* alpha1, const char* word, size_t wordlen
         }
     }
 
-    if (anagrams_only) /* if good and only looking for anagrams, make sure counts equal */
+    if (anagrams_only) { /* if good and only looking for anagrams, make sure counts equal */
         return is_count_equal(alpha1, alpha2);
-    else
+    }
+    else {
         return true; /* word matches criteria */
+    }
 }
 
 /* 

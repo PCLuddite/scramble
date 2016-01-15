@@ -103,9 +103,10 @@ void exit_error(const char* msg)
 void* emalloc(size_t size)
 {
     void* newptr = malloc(size);
-    if (newptr == NULL) {
+    
+    if (newptr == NULL)
         exit_error("call to malloc failed");
-    }
+    
     return newptr;
 }
 
@@ -115,9 +116,10 @@ void* emalloc(size_t size)
 void* erealloc(void* ptr, size_t newsize)
 {
     void* newptr = realloc(ptr, newsize);
-    if (newptr == NULL) {
+
+    if (newptr == NULL)
        exit_error("call to realloc failed");
-    }
+    
     return newptr;
 }
 
