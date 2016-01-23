@@ -1,7 +1,7 @@
 #include "scramble.h"
 #include "finder.h"
 
-/*
+/**
  * displays program usage
  */
 void show_usage(void)
@@ -10,7 +10,7 @@ void show_usage(void)
     fputs("\n--anagrams,-a\tfind only anagrams\n", stdout);
 }
 
-/*
+/**
  * program main
  */
 int main(int argc, char* argv[])
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
-/*
+/**
  * Appends src and a newline ('\n') to dest
  * src is expected to be at least len characters
  */
@@ -88,7 +88,7 @@ void cstrcat_ln(cstring* dest, const char* src, size_t len)
     dest->ptr[dest->size++] = '\n'; /* add newline char and increment size by 1 */
 }
 
-/*
+/**
  * Prints an error, then terminates the program with EXIT_FAILURE
  */
 void exit_error(const char* msg)
@@ -97,7 +97,7 @@ void exit_error(const char* msg)
     exit(EXIT_FAILURE);
 }
 
-/*
+/**
  * malloc, but terminates program on error
  */
 void* emalloc(size_t size)
@@ -110,7 +110,7 @@ void* emalloc(size_t size)
     return newptr;
 }
 
-/*
+/**
  * realloc, but terminates program on error
  */
 void* erealloc(void* ptr, size_t newsize)
@@ -123,7 +123,7 @@ void* erealloc(void* ptr, size_t newsize)
     return newptr;
 }
 
-/*
+/**
  * Sets buff to the path of the word file
  * argv[0] is passed as arg0, but it may not be used depending on the implementation
  */

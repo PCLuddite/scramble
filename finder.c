@@ -1,7 +1,7 @@
 #include "finder.h"
 #include "scramble.h"
 
-/* 
+/**
  * checks to see if two letter counts are equal
  * expects params "alpha1" and "alpha2" to be an array with at least ALPHABET_SIZE elements
  */
@@ -15,7 +15,7 @@ static bool is_count_equal(const size_t alpha1[], const size_t alpha2[])
     return true;
 }
 
-/* 
+/**
  * finds the end of a word (a null-terminator or whitespace)
  */
 static size_t find_end(const char* str)
@@ -27,7 +27,7 @@ static size_t find_end(const char* str)
     return len;
 }
 
-/* 
+/**
  * gets a letter count for a given string, returns string length
  * expects param "alpha" to be an array with at least ALPHABET_SIZE elements
  */
@@ -43,7 +43,7 @@ static size_t count_alpha(const char* str, size_t alpha[])
 }
 
 
-/*
+/**
  * checks wether param "alpha1" has the right letters to form "word"
  * param "alpha1" is expected to be at least ALPHABET_SIZE elements
  */
@@ -77,7 +77,7 @@ static bool contains_word(const size_t* alpha1, const char* word, size_t wordlen
     }
 }
 
-/* 
+/**
  * scans the letter file "in" and appends matching words to the end of param "found"
  * param "found" will be modified when a word is found. It should be properly initialized.
  */
