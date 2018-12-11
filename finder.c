@@ -28,6 +28,42 @@ static size_t find_end(const char* str)
 }
 
 /**
+ * gets a letter's position in the alphabet
+ */
+static int letter_num(char c)
+{
+    switch(toupper(c)) {
+        case 'A': return 0;
+        case 'B': return 1;
+        case 'C': return 2;
+        case 'D': return 3;
+        case 'E': return 4;
+        case 'F': return 5;
+        case 'G': return 6;
+        case 'H': return 7;
+        case 'I': return 8;
+        case 'J': return 9;
+        case 'K': return 10;
+        case 'L': return 11;
+        case 'M': return 12;
+        case 'N': return 13;
+        case 'O': return 14;
+        case 'P': return 15;
+        case 'Q': return 16;
+        case 'R': return 17;
+        case 'S': return 18;
+        case 'T': return 19;
+        case 'U': return 20;
+        case 'V': return 21;
+        case 'W': return 22;
+        case 'X': return 23;
+        case 'Y': return 24;
+        case 'Z': return 25;
+    }
+    return -1;
+}
+
+/**
  * gets a letter count for a given string, returns string length
  * expects param "alpha" to be an array with at least ALPHABET_SIZE elements
  */
@@ -36,12 +72,15 @@ static size_t count_alpha(const char* str, size_t alpha[])
     size_t pos;
     memset(alpha, 0, ALPHABET_SIZE * sizeof*alpha);
     for(pos = 0; str[pos] != '\0'; ++pos) {
-        if (isalpha(str[pos]))
-            ++alpha[tolower(str[pos]) - 'a'];
+        if (isalpha(str[pos])) {
+            int n = letter_num(str[pos]);
+            if (n > -1) {
+                ++alpha[n];
+            }
+        }
     }
     return pos;
 }
-
 
 /**
  * checks wether param "alpha1" has the right letters to form "word"
