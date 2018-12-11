@@ -72,11 +72,9 @@ static size_t count_alpha(const char* str, size_t alpha[])
     size_t pos;
     memset(alpha, 0, ALPHABET_SIZE * sizeof*alpha);
     for(pos = 0; str[pos] != '\0'; ++pos) {
-        if (isalpha(str[pos])) {
-            int n = letter_num(str[pos]);
-            if (n > -1) {
-                ++alpha[n];
-            }
+        int n = letter_num(str[pos]);
+        if (n > -1) {
+            ++alpha[n];
         }
     }
     return pos;
